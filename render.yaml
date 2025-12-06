@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: deepagent-calendar-mcp
+    env: node
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3001
+      - key: CALENDAR_ID
+        sync: false
+      - key: TIMEZONE
+        value: Europe/Rome
+      - key: GOOGLE_CREDENTIALS_PATH
+        value: ./credentials/service-account.json

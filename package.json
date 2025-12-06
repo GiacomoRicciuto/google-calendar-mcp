@@ -1,0 +1,27 @@
+{
+  "name": "deepagent-calendar-mcp",
+  "version": "1.0.0",
+  "description": "MCP Calendar Server per DeepAgent",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node --esm src/index.ts",
+    "start": "node dist/index.js",
+    "test": "node dist/test.js"
+  },
+  "keywords": ["mcp", "calendar", "deepagent"],
+  "author": "DeepAgent",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "googleapis": "^167.0.0",
+    "mcp-use": "^1.9.0",
+    "zod": "^4.1.13"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}

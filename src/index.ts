@@ -6,9 +6,13 @@ import { z } from 'zod';
 import { google } from 'googleapis';
 import { readFileSync } from 'fs';
 import * as dotenv from 'dotenv';
+import { decryptCredentials } from './decrypt-credentials.js';
 
 // Carica variabili ambiente
 dotenv.config();
+
+// Decrypt credentials if CREDENTIALS_KEY is provided
+decryptCredentials();
 
 // ============================================================================
 // CONFIGURAZIONE

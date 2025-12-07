@@ -14,6 +14,17 @@ dotenv.config();
 // CONFIGURAZIONE
 // ============================================================================
 
+// Validate required environment variables
+if (!process.env.CALENDAR_ID) {
+  throw new Error('CALENDAR_ID environment variable is required');
+}
+if (!process.env.TIMEZONE) {
+  throw new Error('TIMEZONE environment variable is required');
+}
+if (!process.env.GOOGLE_CREDENTIALS_PATH) {
+  throw new Error('GOOGLE_CREDENTIALS_PATH environment variable is required');
+}
+
 const CONFIG = {
   calendarId: process.env.CALENDAR_ID,
   timezone: process.env.TIMEZONE,

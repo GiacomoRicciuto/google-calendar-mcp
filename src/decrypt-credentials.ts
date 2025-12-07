@@ -59,6 +59,8 @@ export function decryptCredentials(): void {
 
   } catch (error: any) {
     console.error('❌ Failed to decrypt credentials:', error.message);
-    throw error;
+    console.error('⚠️  Decryption failed - this is OK, will use alternative credential methods');
+    console.error('ℹ️  Make sure you have set GOOGLE_CREDENTIALS_BASE64 or other credential env vars');
+    // Don't throw - allow the app to continue and use other credential methods
   }
 }

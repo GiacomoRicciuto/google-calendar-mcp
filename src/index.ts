@@ -60,7 +60,7 @@ if (!credentials && !process.env.GOOGLE_CREDENTIALS_PATH) {
 const CONFIG = {
   calendarId: process.env.CALENDAR_ID,
   timezone: process.env.TIMEZONE,
-  port: parseInt(process.env.PORT || '3001'),
+  port: parseInt(process.env.PORT || '3000'),
   credentials,
   credentialsPath: process.env.GOOGLE_CREDENTIALS_PATH
 };

@@ -15,10 +15,10 @@ dotenv.config();
 // ============================================================================
 
 const CONFIG = {
-  calendarId: process.env.CALENDAR_ID || 'giacomo.ricciuto4@gmail.com',
-  timezone: process.env.TIMEZONE || 'Europe/Rome',
+  calendarId: process.env.CALENDAR_ID,
+  timezone: process.env.TIMEZONE,
   port: parseInt(process.env.PORT || '3001'),
-  credentialsPath: process.env.GOOGLE_CREDENTIALS_PATH || './credentials/service-account.json'
+  credentialsPath: process.env.GOOGLE_CREDENTIALS_PATH
 };
 
 // ============================================================================

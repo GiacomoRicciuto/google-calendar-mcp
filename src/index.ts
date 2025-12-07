@@ -21,15 +21,43 @@ if (!process.env.CALENDAR_ID) {
 if (!process.env.TIMEZONE) {
   throw new Error('TIMEZONE environment variable is required');
 }
-if (!process.env.GOOGLE_CREDENTIALS && !process.env.GOOGLE_CREDENTIALS_PATH) {
-  throw new Error('Either GOOGLE_CREDENTIALS or GOOGLE_CREDENTIALS_PATH environment variable is required');
+
+// Support multiple credential formats
+let credentials: any = undefined;
+
+// Option 1: Base64 encoded JSON (most compact for env vars)
+if (process.env.GOOGLE_CREDENTIALS_BASE64) {
+  const decoded = Buffer.from(process.env.GOOGLE_CREDENTIALS_BASE64, 'base64').toString('utf-8');
+  credentials = JSON.parse(decoded);
+}
+// Option 2: Direct JSON string
+else if (process.env.GOOGLE_CREDENTIALS) {
+  credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS);
+}
+// Option 3: Individual components (for platforms with strict length limits)
+else if (process.env.GOOGLE_CLIENT_EMAIL && process.env.GOOGLE_PRIVATE_KEY) {
+  credentials = {
+    type: 'service_account',
+    project_id: process.env.GOOGLE_PROJECT_ID || 'deepagent-mcp-calendar',
+    private_key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+    client_email: process.env.GOOGLE_CLIENT_EMAIL,
+    client_id: process.env.GOOGLE_CLIENT_ID || '',
+    auth_uri: 'https://accounts.google.com/o/oauth2/auth',
+    token_uri: 'https://oauth2.googleapis.com/token',
+    auth_provider_x509_cert_url: 'https://www.googleapis.com/oauth2/v1/certs',
+    universe_domain: 'googleapis.com'
+  };
+}
+
+if (!credentials && !process.env.GOOGLE_CREDENTIALS_PATH) {
+  throw new Error('Google credentials required. Use one of: GOOGLE_CREDENTIALS_BASE64, GOOGLE_CREDENTIALS, GOOGLE_CLIENT_EMAIL+GOOGLE_PRIVATE_KEY, or GOOGLE_CREDENTIALS_PATH');
 }
 
 const CONFIG = {
   calendarId: process.env.CALENDAR_ID,
   timezone: process.env.TIMEZONE,
   port: parseInt(process.env.PORT || '3001'),
-  credentials: process.env.GOOGLE_CREDENTIALS ? JSON.parse(process.env.GOOGLE_CREDENTIALS) : undefined,
+  credentials,
   credentialsPath: process.env.GOOGLE_CREDENTIALS_PATH
 };
 

@@ -21,14 +21,15 @@ if (!process.env.CALENDAR_ID) {
 if (!process.env.TIMEZONE) {
   throw new Error('TIMEZONE environment variable is required');
 }
-if (!process.env.GOOGLE_CREDENTIALS_PATH) {
-  throw new Error('GOOGLE_CREDENTIALS_PATH environment variable is required');
+if (!process.env.GOOGLE_CREDENTIALS && !process.env.GOOGLE_CREDENTIALS_PATH) {
+  throw new Error('Either GOOGLE_CREDENTIALS or GOOGLE_CREDENTIALS_PATH environment variable is required');
 }
 
 const CONFIG = {
   calendarId: process.env.CALENDAR_ID,
   timezone: process.env.TIMEZONE,
   port: parseInt(process.env.PORT || '3001'),
+  credentials: process.env.GOOGLE_CREDENTIALS ? JSON.parse(process.env.GOOGLE_CREDENTIALS) : undefined,
   credentialsPath: process.env.GOOGLE_CREDENTIALS_PATH
 };
 
@@ -40,9 +41,16 @@ class CalendarClient {
   private calendar: any;
   private calendarId: string;
 
-  constructor(credentialsPath: string, calendarId: string) {
-    // Leggi credenziali dal file JSON
-    const credentials = JSON.parse(readFileSync(credentialsPath, 'utf-8'));
+  constructor(credentialsOrPath: string | object, calendarId: string) {
+    // Determina se credenziali sono un oggetto o un path
+    let credentials: any;
+    if (typeof credentialsOrPath === 'string') {
+      // Leggi credenziali dal file JSON
+      credentials = JSON.parse(readFileSync(credentialsOrPath, 'utf-8'));
+    } else {
+      // Usa credenziali passate direttamente
+      credentials = credentialsOrPath;
+    }
 
     // Setup autenticazione
     const auth = new google.auth.GoogleAuth({
@@ -181,14 +189,17 @@ const server = createMCPServer('deepagent-calendar', {
 let calendarClient: CalendarClient;
 
 try {
-  calendarClient = new CalendarClient(CONFIG.credentialsPath, CONFIG.calendarId);
+  // Use credentials object if provided, otherwise use path
+  const credentialsSource = CONFIG.credentials || CONFIG.credentialsPath!;
+  calendarClient = new CalendarClient(credentialsSource, CONFIG.calendarId);
   console.log('✅ Google Calendar client initialized');
   console.log(`📅 Calendar: ${CONFIG.calendarId}\n`);
 } catch (error: any) {
   console.error('❌ Error initializing Google Calendar client:', error.message);
   console.error('\n💡 Make sure you have:');
-  console.error('  1. Created service-account.json in credentials/');
-  console.error('  2. Shared your calendar with the service account email\n');
+  console.error('  1. Set GOOGLE_CREDENTIALS env var with JSON string, OR');
+  console.error('  2. Set GOOGLE_CREDENTIALS_PATH and created service-account.json file');
+  console.error('  3. Shared your calendar with the service account email\n');
   process.exit(1);
 }
 
